@@ -5,22 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>Rambo 公益互动站｜公益知识问答</title>
   <meta name="theme-color" content="#43A2FF" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <style>
     :root{
       --brand:#43A2FF;
-      --brand-dark:#3a8cdf;
+      --brand-dark:#357fd4;
       --accent:#FFB84D;
+      --bg:#f7faff;
       --text:#1f2a37;
       --muted:#6b7280;
       --card:#ffffff;
+      --radius:18px;
       --shadow:0 10px 30px rgba(67,162,255,.15);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--text);background:linear-gradient(180deg,#eef5ff 0%,#ffffff 100%);}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+      color:var(--text);
+      background: radial-gradient(1200px 600px at 70% -10%, #e8f2ff 0%, transparent 60%),
+                  radial-gradient(900px 500px at -10% 20%, #fff1db 0%, transparent 60%),
+                  linear-gradient(180deg,#f5f9ff 0%,#ffffff 100%);
+    }
     .container{max-width:960px;margin:0 auto;padding:24px}
-    .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:20px}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
     header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
     .logo{display:flex;align-items:center;gap:10px}
     .logo-badge{width:36px;height:36px;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:#e6f1ff;box-shadow:0 4px 12px rgba(0,0,0,.08)}
@@ -66,16 +74,16 @@
     .share-wrap.show{display:grid}
     .share-actions{display:flex;gap:10px;flex-wrap:wrap}
     canvas.share{width:100%;max-width:420px;border:1px solid #e5e7eb;border-radius:16px}
+    .footer-mark{display:flex;align-items:center;gap:8px;justify-content:center;color:#94a3b8;font-size:12px;margin-top:20px}
+    .footer-mark img{width:16px;height:16px;border-radius:4px}
     @media (max-width:520px){
       .btn{width:100%}
       .footer{flex-direction:column;align-items:stretch}
     }
-    .watermark{position:fixed;inset:0;pointer-events:none;opacity:.04;background-repeat:repeat;mix-blend-mode:multiply;background-image:url('./assets/徽章.png');background-size:200px 200px;background-position:0 0, 100px 100px;}
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="watermark"></div>
     <header>
       <div class="logo">
         <div class="logo-badge"><img id="badgeImg" src="./assets/徽章.png" alt="Rambo Badge" /></div>
@@ -84,11 +92,7 @@
           <div class="muted" style="font-size:12px">Rambo 公益互动站</div>
         </div>
       </div>
-      <div class="btn-row">
-        <button class="btn btn-ghost" id="btnSetBadge" title="设置徽章图">徽章</button>
-        <input id="badgeFile" type="file" accept="image/*" class="hidden" />
-        <button class="btn btn-ghost" id="btnResetTop" title="重做一次">重做</button>
-      </div>
+      <!-- 右上角按钮已移除：徽章、重做 -->
     </header>
 
     <!-- Start Screen -->
@@ -155,25 +159,12 @@
           <summary>逐题回顾</summary>
           <div id="reviewList"></div>
         </details>
+        <div class="footer-mark"><img src="./assets/徽章.png" alt=""><span>Rambo 公益互动站</span></div>
       </div>
     </section>
   </div>
 
   <script>
-    // ===== 徽章加载/水印 =====
-    function setBadgeURL(url){
-      const img = document.getElementById('badgeImg');
-      try{ img.src = url; }catch(e){}
-      const wm = document.querySelector('.watermark');
-      if(wm){ wm.style.backgroundImage = `url(${url})`; }
-    }
-    function pickLocalBadge(file){
-      const reader = new FileReader();
-      reader.onload = (e)=> setBadgeURL(e.target.result);
-      reader.readAsDataURL(file);
-    }
-
-    // ===== 题库（单选 + 判断） =====
     const SINGLE = [
       {type:'single',title:'“公益”的核心目标是？',options:['追求利润最大化','解决公共问题、增进社会福祉','扩大品牌曝光','获取税收减免'],answer:1,explain:'公益以社会价值为导向，强调公共利益。'},
       {type:'single',title:'发起校园募捐活动时最重要的第一步是？',options:['先做精美海报','明确受益对象与用途并公开说明','找名人站台','先定抽奖奖励'],answer:1,explain:'信息透明是信任基础。'},
@@ -196,7 +187,6 @@
     ];
     let QUESTIONS = [...SINGLE, ...JUDGE];
 
-    // ===== 状态管理 =====
     const els = {
       screenStart: document.getElementById('screenStart'),
       screenQuiz: document.getElementById('screenQuiz'),
@@ -206,7 +196,6 @@
       btnPrev: document.getElementById('btnPrev'),
       btnNext: document.getElementById('btnNext'),
       btnClear: document.getElementById('btnClear'),
-      btnResetTop: document.getElementById('btnResetTop'),
       qTitle: document.getElementById('qTitle'),
       optList: document.getElementById('optList'),
       pillType: document.getElementById('pillType'),
@@ -217,15 +206,13 @@
       scoreText: document.getElementById('scoreText'),
       statRight: document.getElementById('statRight'),
       statWrong: document.getElementById('statWrong'),
-      statTime: document.getElementById(('statTime'),
+      statTime: document.getElementById('statTime'),
       btnReview: document.getElementById('btnReview'),
       btnAgain: document.getElementById('btnAgain'),
       reviewBox: document.getElementById('reviewBox'),
       reviewList: document.getElementById('reviewList'),
       sloganBox: document.getElementById('sloganBox'),
     };
-    // fix statTime selector typo
-    els.statTime = document.getElementById('statTime');
 
     let idx = 0;
     let picks = Array(QUESTIONS.length).fill(null);
@@ -239,21 +226,10 @@
     ];
     let sloganIdx = Math.floor(Math.random()*SLOGANS.length);
 
-    function fmtTime(sec){
-      const m = String(Math.floor(sec/60)).padStart(2,'0');
-      const s = String(Math.floor(sec%60)).padStart(2,'0');
-      return `${m}:${s}`;
-    }
-    function startTimer(){
-      startAt = Date.now();
-      stopTimer();
-      timerId = setInterval(()=>{
-        const elapsed = Math.floor((Date.now()-startAt)/1000);
-        els.timer.textContent = fmtTime(elapsed);
-      }, 500);
-    }
+    function fmtTime(sec){ const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(Math.floor(sec%60)).padStart(2,'0'); return `${m}:${s}`;}
+    function startTimer(){ startAt=Date.now(); stopTimer(); timerId=setInterval(()=>{ const elapsed=Math.floor((Date.now()-startAt)/1000); els.timer.textContent=fmtTime(elapsed); },500); }
     function stopTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
-    function show(el){ el.classList.remove('hidden'); try{ window.scrollTo({top:0, behavior:'instant'}); }catch(_){} }
+    function show(el){ el.classList.remove('hidden'); try{ window.scrollTo({top:0, behavior:'instant'});}catch(_){} }
     function hide(el){ el.classList.add('hidden'); }
     function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
 
@@ -265,8 +241,6 @@
       els.bar.style.width = '0%';
       els.timer.textContent = '00:00';
       hide(els.screenQuiz); hide(els.screenResult); show(els.screenStart);
-      // 尝试默认加载 assets/徽章.png
-      setBadgeURL('./assets/徽章.png');
     }
 
     function render(){
@@ -279,10 +253,7 @@
       q.options.forEach((t, i)=>{
         const opt = document.createElement('label');
         opt.className = 'opt';
-        opt.innerHTML = `
-          <input type="radio" name="opt" ${picks[idx]===i?'checked':''} />
-          <div class="opt-label">${letters[i]||''}</div>
-          <div class="opt-text">${t}</div>`;
+        opt.innerHTML = `<input type="radio" name="opt" ${picks[idx]===i?'checked':''} /><div class="opt-label">${letters[i]||''}</div><div class="opt-text">${t}</div>`;
         opt.addEventListener('click', ()=>{ picks[idx] = i; updateBar(); });
         els.optList.appendChild(opt);
       });
@@ -290,18 +261,12 @@
       els.btnPrev.disabled = idx===0;
       els.btnNext.textContent = idx===QUESTIONS.length-1 ? '提交' : '下一题';
     }
-    function updateBar(){
-      const answered = picks.filter(v=>v!==null).length;
-      const pct = Math.round(answered/QUESTIONS.length*100);
-      els.bar.style.width = pct+'%';
-    }
+
+    function updateBar(){ const answered=picks.filter(v=>v!==null).length; const pct=Math.round(answered/QUESTIONS.length*100); els.bar.style.width=pct+'%'; }
+
     function submit(){
       let right=0; const review=[];
-      QUESTIONS.forEach((q, i)=>{
-        const isRight = picks[i]===q.answer;
-        if(isRight) right++;
-        review.push({ no:i+1, title:q.title, your:picks[i], correct:q.answer, options:q.options, explain:q.explain, type:q.type });
-      });
+      QUESTIONS.forEach((q, i)=>{ const isRight = picks[i]===q.answer; if(isRight) right++; review.push({ no:i+1, title:q.title, your:picks[i], correct:q.answer, options:q.options, explain:q.explain, type:q.type }); });
       const wrong = QUESTIONS.length - right;
       els.scoreText.textContent = `${right} / ${QUESTIONS.length}`;
       els.statRight.textContent = right;
@@ -310,46 +275,31 @@
       els.sloganBox.textContent = SLOGANS[sloganIdx];
       els.reviewList.innerHTML = '';
       review.forEach(r=>{
-        const letters = ['A','B','C','D'];
-        const div = document.createElement('div');
-        div.className = 'review-item';
+        const letters=['A','B','C','D'];
+        const div=document.createElement('div'); div.className='review-item';
         const yourText = r.your===null ? '未作答' : `${letters[r.your]}. ${r.options[r.your]}`;
         const corrText = `${letters[r.correct]||''}${r.type==='judge'?'':'. '} ${r.options[r.correct]}`;
         const ok = r.your===r.correct;
-        div.innerHTML = `
-          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap">
-            <div><b>${r.no}. ${r.title}</b></div>
-            <span class="tag ${ok?'tag-ok':'tag-err'}">${ok?'✔ 正确':'✘ 错误'}</span>
-          </div>
-          <div style="margin-top:6px">你的作答：<b>${yourText}</b></div>
-          <div>标准答案：<b>${corrText}</b></div>
-          ${r.explain?`<div class="muted" style="margin-top:6px">解析：${r.explain}</div>`:''}`;
+        div.innerHTML = `<div style="display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap"><div><b>${r.no}. ${r.title}</b></div><span class="tag ${ok?'tag-ok':'tag-err'}">${ok?'✔ 正确':'✘ 错误'}</span></div><div style="margin-top:6px">你的作答：<b>${yourText}</b></div><div>标准答案：<b>${corrText}</b></div>${r.explain?`<div class="muted" style="margin-top:6px">解析：${r.explain}</div>`:''}`;
         els.reviewList.appendChild(div);
       });
       hide(els.screenQuiz); show(els.screenResult);
       stopTimer();
     }
 
-    // 生成分享卡片
     function roundRect(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath(); }
     function drawShare(){
-      const c = document.getElementById('shareCanvas');
-      if(!c) return; const ctx = c.getContext('2d');
-      const W = c.width, H = c.height;
-      const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#eef6ff'); g.addColorStop(1,'#fff4e2');
-      ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
-      const pad = 64; roundRect(ctx, pad, pad, W-2*pad, H-2*pad, 48); ctx.fillStyle = '#ffffff'; ctx.fill();
-      const img = document.getElementById('badgeImg');
-      const bw = 240, bh = 240, bx = pad+48, by = pad+48;
-      if(img && img.src){ try{ ctx.save(); roundRect(ctx, bx, by, bw, bh, 24); ctx.clip(); ctx.drawImage(img, bx, by, bw, bh); ctx.restore(); }catch(e){} }
-      ctx.fillStyle = '#111827'; ctx.font = '700 56px system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillText('公益知识问答', bx, by + bh + 80);
-      ctx.fillStyle = '#3a8cdf'; ctx.font = '800 120px system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillText(document.getElementById('scoreText').textContent, bx, by + bh + 200);
-      ctx.fillStyle = '#374151'; ctx.font = '600 40px system-ui, -apple-system, Segoe UI, Roboto';
-      ctx.fillText(`正确 ${document.getElementById('statRight').textContent} · 错误 ${document.getElementById('statWrong').textContent} · 用时 ${document.getElementById('statTime').textContent}`, bx, by + bh + 270);
-      ctx.fillStyle = '#374151'; ctx.font = '700 44px system-ui, -apple-system, Segoe UI, Roboto';
-      const S = SLOGANS[sloganIdx] || 'Rambo 说：善意不设门槛';
-      ctx.fillText(S, bx, H - pad - 100);
-      ctx.fillStyle = '#6b7280'; ctx.font = '500 34px system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillText('Rambo 公益互动站｜扫码参与', bx, H - pad - 40);
+      const c = document.getElementById('shareCanvas'); if(!c) return; const ctx=c.getContext('2d');
+      const W=c.width,H=c.height;
+      const g=ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#eef6ff'); g.addColorStop(1,'#fff4e2'); ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+      const pad=64; roundRect(ctx,pad,pad,W-2*pad,H-2*pad,48); ctx.fillStyle='#ffffff'; ctx.fill();
+      const img=document.getElementById('badgeImg'); const bw=180,bh=180,bx=pad+48,by=pad+48;
+      if(img && img.src){ try{ ctx.save(); roundRect(ctx,bx,by,bw,bh,20); ctx.clip(); ctx.drawImage(img,bx,by,bw,bh); ctx.restore(); }catch(e){} }
+      ctx.fillStyle='#111827'; ctx.font='700 56px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText('公益知识问答', bx, by + bh + 80);
+      ctx.fillStyle='#3a8cdf'; ctx.font='800 120px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText(document.getElementById('scoreText').textContent, bx, by + bh + 190);
+      ctx.fillStyle='#374151'; ctx.font='600 40px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText(`正确 ${document.getElementById('statRight').textContent} · 错误 ${document.getElementById('statWrong').textContent} · 用时 ${document.getElementById('statTime').textContent}`, bx, by + bh + 250);
+      ctx.fillStyle='#374151'; ctx.font='700 44px system-ui,-apple-system,Segoe UI,Roboto'; const slogans = ['Rambo 说：善意不设门槛','跟着 Rambo 去做对的事','Rambo 认证：公益小达人','Rambo 为你点亮小星星']; const slogan = slogans[sloganIdx] || slogans[0]; ctx.fillText(slogan, bx, H - pad - 100);
+      ctx.fillStyle='#6b7280'; ctx.font='500 34px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText('Rambo 公益互动站｜扫码参与', bx, H - pad - 40);
     }
 
     // 事件绑定
@@ -360,28 +310,11 @@
     document.getElementById('btnClear').addEventListener('click', ()=>{ picks[idx]=null; render(); });
     document.getElementById('btnReview').addEventListener('click', ()=>{ document.getElementById('reviewBox').classList.toggle('hidden'); });
     document.getElementById('btnAgain').addEventListener('click', ()=>{ reset(false); });
-    document.getElementById('btnResetTop').addEventListener('click', ()=>{ reset(false); });
-    const btnShare = document.getElementById('btnShare');
-    const shareWrap = document.getElementById('shareWrap');
-    const btnDownload = document.getElementById('btnDownload');
-    btnShare.addEventListener('click', ()=>{ drawShare(); shareWrap.classList.add('show'); const c = document.getElementById('shareCanvas'); if(c){ btnDownload.href = c.toDataURL('image/png'); } });
-    const btnNextSlogan = document.getElementById('btnNextSlogan');
-    btnNextSlogan.addEventListener('click', ()=>{ sloganIdx = (sloganIdx+1)%SLOGANS.length; els.sloganBox.textContent = SLOGANS[sloganIdx]; });
+    const btnShare=document.getElementById('btnShare'); const shareWrap=document.getElementById('shareWrap'); const btnDownload=document.getElementById('btnDownload');
+    btnShare.addEventListener('click', ()=>{ drawShare(); shareWrap.classList.add('show'); const c=document.getElementById('shareCanvas'); if(c){ btnDownload.href=c.toDataURL('image/png'); } });
+    const btnNextSlogan = document.getElementById('btnNextSlogan'); btnNextSlogan.addEventListener('click', ()=>{ const slogans = ['Rambo 说：善意不设门槛','跟着 Rambo 去做对的事','Rambo 认证：公益小达人','Rambo 为你点亮小星星']; sloganIdx=(sloganIdx+1)%slogans.length; els.sloganBox.textContent=slogans[sloganIdx]; });
 
-    // 设置徽章按钮
-    const btnSetBadge = document.getElementById('btnSetBadge');
-    const badgeFile = document.getElementById('badgeFile');
-    btnSetBadge.addEventListener('click', ()=>{
-      const pick = window.prompt('输入徽章图片链接（或留空使用本地上传）：');
-      if(pick && pick.trim()){ setBadgeURL(pick.trim()); }
-      else { badgeFile.click(); }
-    });
-    badgeFile.addEventListener('change', (e)=>{ if(e.target.files && e.target.files[0]) pickLocalBadge(e.target.files[0]); });
-
-    // init
     reset(false);
-    // 默认载入 assets/徽章.png
-    try{ setBadgeURL('./assets/徽章.png'); }catch(e){}
   </script>
 </body>
 </html>
