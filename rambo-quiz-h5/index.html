@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>Rambo 公益互动站｜公益知识问答</title>
+  <meta name="theme-color" content="#43A2FF" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <style>
+    :root{
+      --brand:#43A2FF;
+      --brand-dark:#3a8cdf;
+      --accent:#FFB84D;
+      --text:#1f2a37;
+      --muted:#6b7280;
+      --card:#ffffff;
+      --shadow:0 10px 30px rgba(67,162,255,.15);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;color:var(--text);background:linear-gradient(180deg,#eef5ff 0%,#ffffff 100%);}
+    .container{max-width:960px;margin:0 auto;padding:24px}
+    .card{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:20px}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo-badge{width:36px;height:36px;border-radius:10px;overflow:hidden;display:grid;place-items:center;background:#e6f1ff;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+    .logo-badge img{width:100%;height:100%;object-fit:contain;display:block}
+    .title{font-size:20px;font-weight:800;letter-spacing:.2px}
+    .muted{color:var(--muted)}
+    .btn{cursor:pointer;border:0;border-radius:14px;padding:12px 18px;font-weight:700;transition:.2s;box-shadow:0 6px 18px rgba(67,162,255,.18)}
+    .btn-primary{background:var(--brand);color:#fff}
+    .btn-primary:hover{background:var(--brand-dark)}
+    .btn-ghost{background:#fff;color:var(--brand);border:1px solid #e5e7eb;box-shadow:none}
+    .btn-row{display:flex;gap:12px;flex-wrap:wrap}
+    .hidden{display:none}
+    .progress{height:10px;background:#e8eef9;border-radius:999px;overflow:hidden}
+    .bar{height:100%;background:linear-gradient(90deg, var(--brand), var(--accent));width:0%}
+    .hero{display:grid;gap:16px;place-items:center;text-align:center;padding:28px}
+    .hero h1{margin:0;font-size:26px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:#eef6ff;color:#2563eb;font-weight:600}
+    .kv{width:min(680px,100%);aspect-ratio:16/9;background:linear-gradient(135deg,#dff0ff,#ffe9cc);border-radius:22px;display:grid;place-items:center;border:1px solid #e5efff}
+    .kv > div{font-size:56px;font-weight:800;background:linear-gradient(120deg,var(--brand),#2dd4bf,var(--accent));-webkit-background-clip:text;color:transparent}
+    .q-wrap{display:grid;gap:18px}
+    .q-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .pill{padding:6px 10px;border-radius:999px;background:#f3f4f6;color:#374151}
+    .q-title{font-size:18px;font-weight:800;line-height:1.4}
+    .opt-list{display:grid;gap:10px}
+    .opt{border:1px solid #e5e7eb;border-radius:14px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;background:#fff;cursor:pointer;transition:.15s}
+    .opt:hover{border-color:#bfd9ff;transform:translateY(-1px)}
+    .opt input{margin-top:3px}
+    .opt-label{font-weight:700;width:28px;flex-shrink:0;color:#334155}
+    .opt-text{line-height:1.6}
+    .footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:12px}
+    .result{display:grid;gap:14px}
+    .score-badge{display:grid;place-items:center;padding:20px;border-radius:18px;background:linear-gradient(135deg,#e9f5ff,#fff4e2);border:1px solid #e6eefc}
+    .score-badge h2{margin:4px 0 0 0}
+    .stat-row{display:flex;gap:10px;flex-wrap:wrap}
+    .stat{background:#f8fafc;border:1px solid #ecf0f6;border-radius:12px;padding:8px 12px}
+    details{border:1px solid #e6eaf2;border-radius:14px;padding:10px 12px;background:#fff}
+    summary{cursor:pointer;font-weight:700}
+    .review-item{border-top:1px dashed #e5e7eb;padding-top:10px;margin-top:10px}
+    .tag-ok{color:#065f46;background:#ecfdf5}
+    .tag-err{color:#7f1d1d;background:#fef2f2}
+    .tag{display:inline-block;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+    .share-wrap{display:none;grid-template-columns:1fr;gap:12px;margin-top:10px}
+    .share-wrap.show{display:grid}
+    .share-actions{display:flex;gap:10px;flex-wrap:wrap}
+    canvas.share{width:100%;max-width:420px;border:1px solid #e5e7eb;border-radius:16px}
+    @media (max-width:520px){
+      .btn{width:100%}
+      .footer{flex-direction:column;align-items:stretch}
+    }
+    .watermark{position:fixed;inset:0;pointer-events:none;opacity:.04;background-repeat:repeat;mix-blend-mode:multiply;background-image:url('./assets/徽章.png');background-size:200px 200px;background-position:0 0, 100px 100px;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="watermark"></div>
+    <header>
+      <div class="logo">
+        <div class="logo-badge"><img id="badgeImg" src="./assets/徽章.png" alt="Rambo Badge" /></div>
+        <div>
+          <div class="title">公益知识问答</div>
+          <div class="muted" style="font-size:12px">Rambo 公益互动站</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnSetBadge" title="设置徽章图">徽章</button>
+        <input id="badgeFile" type="file" accept="image/*" class="hidden" />
+        <button class="btn btn-ghost" id="btnResetTop" title="重做一次">重做</button>
+      </div>
+    </header>
+
+    <!-- Start Screen -->
+    <section id="screenStart" class="card hero">
+      <span class="chip">和 Rambo 一起发光</span>
+      <div class="kv"><div>Ready?</div></div>
+      <h1>用 5~8 分钟，测测你的公益素养</h1>
+      <p class="muted">规则：单选每题 1 分，判断每题 1 分；做完立即出分，还可回看解析。</p>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btnStart">开始答题</button>
+        <button class="btn btn-ghost" id="btnShuffle">随机出题</button>
+      </div>
+    </section>
+
+    <!-- Quiz Screen -->
+    <section id="screenQuiz" class="card hidden">
+      <div class="q-wrap">
+        <div class="q-head">
+          <div class="pill" id="pillType">单选题</div>
+          <div class="progress" style="flex:1"><div class="bar" id="bar"></div></div>
+          <div class="pill">第 <b id="idxNow">1</b>/<span id="idxTotal">16</span> · ⏱️ <span id="timer">00:00</span></div>
+        </div>
+        <div class="q-title" id="qTitle">题干</div>
+        <div class="opt-list" id="optList"></div>
+        <div class="footer">
+          <button class="btn btn-ghost" id="btnPrev">上一题</button>
+          <div class="btn-row">
+            <button class="btn btn-ghost" id="btnClear">清除选择</button>
+            <button class="btn btn-primary" id="btnNext">下一题</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result Screen -->
+    <section id="screenResult" class="card hidden">
+      <div class="result">
+        <div class="score-badge">
+          <div class="muted">成绩</div>
+          <h2 id="scoreText">0 / 16</h2>
+          <div class="stat-row">
+            <div class="stat">✅ 正确：<b id="statRight">0</b></div>
+            <div class="stat">❌ 错误：<b id="statWrong">0</b></div>
+            <div class="stat">⏱️ 用时：<b id="statTime">00:00</b></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:6px">
+          <div class="pill" id="sloganBox">Rambo 说：善意不设门槛</div>
+          <button class="btn btn-ghost" id="btnNextSlogan" title="换一句">换一句</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnReview">查看解析</button>
+          <button class="btn btn-ghost" id="btnAgain">再做一次</button>
+          <button class="btn btn-ghost" id="btnShare">生成分享卡片</button>
+        </div>
+        <div class="share-wrap" id="shareWrap">
+          <canvas class="share" id="shareCanvas" width="1080" height="1350"></canvas>
+          <div class="share-actions">
+            <a class="btn btn-primary" id="btnDownload" download="Rambo公益答题-成绩卡.png">下载 PNG</a>
+          </div>
+        </div>
+
+        <details style="margin-top:10px" id="reviewBox" class="hidden">
+          <summary>逐题回顾</summary>
+          <div id="reviewList"></div>
+        </details>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    // ===== 徽章加载/水印 =====
+    function setBadgeURL(url){
+      const img = document.getElementById('badgeImg');
+      try{ img.src = url; }catch(e){}
+      const wm = document.querySelector('.watermark');
+      if(wm){ wm.style.backgroundImage = `url(${url})`; }
+    }
+    function pickLocalBadge(file){
+      const reader = new FileReader();
+      reader.onload = (e)=> setBadgeURL(e.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    // ===== 题库（单选 + 判断） =====
+    const SINGLE = [
+      {type:'single',title:'“公益”的核心目标是？',options:['追求利润最大化','解决公共问题、增进社会福祉','扩大品牌曝光','获取税收减免'],answer:1,explain:'公益以社会价值为导向，强调公共利益。'},
+      {type:'single',title:'发起校园募捐活动时最重要的第一步是？',options:['先做精美海报','明确受益对象与用途并公开说明','找名人站台','先定抽奖奖励'],answer:1,explain:'信息透明是信任基础。'},
+      {type:'single',title:'关于志愿服务时间记录，最佳做法是？',options:['自行估算填报','由组织现场签到并留存佐证','让同学互相签名代替','不需要记录'],answer:1,explain:'可核验的记录保证公信力。'},
+      {type:'single',title:'线上看到“求助信息”，转发前应优先做什么？',options:['立刻转发扩大声量','联系媒体报道','核验来源与真实性','自拟标题增强情绪'],answer:2,explain:'反诈与反谣是公益基本素养。'},
+      {type:'single',title:'公益影像拍摄时涉及个人隐私的正确做法？',options:['默认可拍可发','模糊处理即可，无需同意','取得被摄者（或监护人）知情同意并说明用途','只在私聊群发'],answer:2,explain:'知情同意与合规使用是底线。'},
+      {type:'single',title:'“可持续发展目标（SDGs）”更符合哪种表述？',options:['仅面向环保','面向经济、社会、环境的综合目标','面向企业利润','面向个人成长'],answer:1,explain:'SDGs 包含消贫、教育、气候等 17 项。'},
+      {type:'single',title:'线下活动的无障碍友好不包括？',options:['清晰导向标识','仅口头说明路线','预留轮椅通道与无障碍座位','可读性高的材料'],answer:1,explain:'仅口头说明不够，应提供可达性的实质安排。'},
+      {type:'single',title:'垃圾分类中，易拉罐通常属于？',options:['厨余垃圾','有害垃圾','可回收物','其他'],answer:2,explain:'金属类一般属于可回收。'},
+      {type:'single',title:'志愿者出现身体不适的正确处理？',options:['忍一忍继续','立即向负责人报告并停止相关工作','事后再说','让同伴顶替签名'],answer:1,explain:'安全第一，及时上报和停止作业。'},
+      {type:'single',title:'灾害发生后捐赠物资的合理原则是？',options:['清仓式处理闲置','以受援方清单需求为准','越多越好','先寄大件'],answer:1,explain:'需求对接优先，避免资源错配。'},
+      {type:'single',title:'公益数据（捐款、受助人信息）管理应遵循？',options:['公开所有细节体现透明','仅内部知晓，无需制度','最小必要、去标识化、合规留存与披露','云盘随意共享'],answer:2,explain:'透明 ≠ 裸露隐私，需最小必要与去标识化。'},
+      {type:'single',title:'AIGC（生成式AI）用于公益传播时，首先要注意？',options:['输出越煽情越好','必须换上IP形象','标注合成/演绎、避免伪造事实与误导','只追求点击'],answer:2,explain:'真实性与合规标注是底线。'}
+    ];
+    const JUDGE = [
+      { type:'judge', title:'“公益传播只要流量高，就一定有效”。', options:['对','错'], answer:1, explain:'应看实际问题改善与目标达成。' },
+      { type:'judge', title:'“公开透明”意味着受助者的所有个人信息必须公开。', options:['对','错'], answer:1, explain:'透明应与隐私保护并重。' },
+      { type:'judge', title:'未经允许转载他人公益照片，只要标注来源就合规。', options:['对','错'], answer:1, explain:'需取得授权并合规使用。' },
+      { type:'judge', title:'活动有赞助就必须在物料上明显标注赞助信息。', options:['对','错'], answer:0, explain:'赞助披露有助于利益相关透明。' }
+    ];
+    let QUESTIONS = [...SINGLE, ...JUDGE];
+
+    // ===== 状态管理 =====
+    const els = {
+      screenStart: document.getElementById('screenStart'),
+      screenQuiz: document.getElementById('screenQuiz'),
+      screenResult: document.getElementById('screenResult'),
+      btnStart: document.getElementById('btnStart'),
+      btnShuffle: document.getElementById('btnShuffle'),
+      btnPrev: document.getElementById('btnPrev'),
+      btnNext: document.getElementById('btnNext'),
+      btnClear: document.getElementById('btnClear'),
+      btnResetTop: document.getElementById('btnResetTop'),
+      qTitle: document.getElementById('qTitle'),
+      optList: document.getElementById('optList'),
+      pillType: document.getElementById('pillType'),
+      idxNow: document.getElementById('idxNow'),
+      idxTotal: document.getElementById('idxTotal'),
+      bar: document.getElementById('bar'),
+      timer: document.getElementById('timer'),
+      scoreText: document.getElementById('scoreText'),
+      statRight: document.getElementById('statRight'),
+      statWrong: document.getElementById('statWrong'),
+      statTime: document.getElementBy('statTime'),
+      btnReview: document.getElementById('btnReview'),
+      btnAgain: document.getElementById('btnAgain'),
+      reviewBox: document.getElementById('reviewBox'),
+      reviewList: document.getElementById('reviewList'),
+      sloganBox: document.getElementById('sloganBox'),
+    };
+    // fix statTime selector typo
+    els.statTime = document.getElementById('statTime');
+
+    let idx = 0;
+    let picks = Array(QUESTIONS.length).fill(null);
+    let startAt = 0;
+    let timerId = null;
+    const SLOGANS = [
+      'Rambo 说：善意不设门槛',
+      '跟着 Rambo 去做对的事',
+      'Rambo 认证：公益小达人',
+      'Rambo 为你点亮小星星'
+    ];
+    let sloganIdx = Math.floor(Math.random()*SLOGANS.length);
+
+    function fmtTime(sec){
+      const m = String(Math.floor(sec/60)).padStart(2,'0');
+      const s = String(Math.floor(sec%60)).padStart(2,'0');
+      return `${m}:${s}`;
+    }
+    function startTimer(){
+      startAt = Date.now();
+      stopTimer();
+      timerId = setInterval(()=>{
+        const elapsed = Math.floor((Date.now()-startAt)/1000);
+        els.timer.textContent = fmtTime(elapsed);
+      }, 500);
+    }
+    function stopTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
+    function show(el){ el.classList.remove('hidden'); try{ window.scrollTo({top:0, behavior:'instant'}); }catch(_){} }
+    function hide(el){ el.classList.add('hidden'); }
+    function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
+
+    function reset(shuffleQ=false){
+      QUESTIONS = [...SINGLE, ...JUDGE];
+      if(shuffleQ) shuffle(QUESTIONS);
+      idx = 0; picks = Array(QUESTIONS.length).fill(null);
+      els.idxTotal.textContent = QUESTIONS.length;
+      els.bar.style.width = '0%';
+      els.timer.textContent = '00:00';
+      hide(els.screenQuiz); hide(els.screenResult); show(els.screenStart);
+      // 尝试默认加载 assets/徽章.png
+      setBadgeURL('./assets/徽章.png');
+    }
+
+    function render(){
+      const q = QUESTIONS[idx];
+      els.idxNow.textContent = idx+1;
+      els.pillType.textContent = q.type === 'single' ? '单选题' : '判断题';
+      els.qTitle.textContent = q.title;
+      els.optList.innerHTML = '';
+      const letters = ['A','B','C','D'];
+      q.options.forEach((t, i)=>{
+        const opt = document.createElement('label');
+        opt.className = 'opt';
+        opt.innerHTML = `
+          <input type="radio" name="opt" ${picks[idx]===i?'checked':''} />
+          <div class="opt-label">${letters[i]||''}</div>
+          <div class="opt-text">${t}</div>`;
+        opt.addEventListener('click', ()=>{ picks[idx] = i; updateBar(); });
+        els.optList.appendChild(opt);
+      });
+      updateBar();
+      els.btnPrev.disabled = idx===0;
+      els.btnNext.textContent = idx===QUESTIONS.length-1 ? '提交' : '下一题';
+    }
+    function updateBar(){
+      const answered = picks.filter(v=>v!==null).length;
+      const pct = Math.round(answered/QUESTIONS.length*100);
+      els.bar.style.width = pct+'%';
+    }
+    function submit(){
+      let right=0; const review=[];
+      QUESTIONS.forEach((q, i)=>{
+        const isRight = picks[i]===q.answer;
+        if(isRight) right++;
+        review.push({ no:i+1, title:q.title, your:picks[i], correct:q.answer, options:q.options, explain:q.explain, type:q.type });
+      });
+      const wrong = QUESTIONS.length - right;
+      els.scoreText.textContent = `${right} / ${QUESTIONS.length}`;
+      els.statRight.textContent = right;
+      els.statWrong.textContent = wrong;
+      els.statTime.textContent = els.timer.textContent;
+      els.sloganBox.textContent = SLOGANS[sloganIdx];
+      els.reviewList.innerHTML = '';
+      review.forEach(r=>{
+        const letters = ['A','B','C','D'];
+        const div = document.createElement('div');
+        div.className = 'review-item';
+        const yourText = r.your===null ? '未作答' : `${letters[r.your]}. ${r.options[r.your]}`;
+        const corrText = `${letters[r.correct]||''}${r.type==='judge'?'':'. '} ${r.options[r.correct]}`;
+        const ok = r.your===r.correct;
+        div.innerHTML = `
+          <div style="display:flex;align-items:center;gap:8px;justify-content:space-between;flex-wrap:wrap">
+            <div><b>${r.no}. ${r.title}</b></div>
+            <span class="tag ${ok?'tag-ok':'tag-err'}">${ok?'✔ 正确':'✘ 错误'}</span>
+          </div>
+          <div style="margin-top:6px">你的作答：<b>${yourText}</b></div>
+          <div>标准答案：<b>${corrText}</b></div>
+          ${r.explain?`<div class="muted" style="margin-top:6px">解析：${r.explain}</div>`:''}`;
+        els.reviewList.appendChild(div);
+      });
+      hide(els.screenQuiz); show(els.screenResult);
+      stopTimer();
+    }
+
+    // 生成分享卡片
+    function roundRect(ctx, x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x+r, y); ctx.arcTo(x+w, y, x+w, y+h, r); ctx.arcTo(x+w, y+h, x, y+h, r); ctx.arcTo(x, y+h, x, y, r); ctx.arcTo(x, y, x+w, y, r); ctx.closePath(); }
+    function drawShare(){
+      const c = document.getElementById('shareCanvas');
+      if(!c) return; const ctx = c.getContext('2d');
+      const W = c.width, H = c.height;
+      const g = ctx.createLinearGradient(0,0,0,H); g.addColorStop(0,'#eef6ff'); g.addColorStop(1,'#fff4e2');
+      ctx.fillStyle = g; ctx.fillRect(0,0,W,H);
+      const pad = 64; roundRect(ctx, pad, pad, W-2*pad, H-2*pad, 48); ctx.fillStyle = '#ffffff'; ctx.fill();
+      const img = document.getElementById('badgeImg');
+      const bw = 240, bh = 240, bx = pad+48, by = pad+48;
+      if(img && img.src){ try{ ctx.save(); roundRect(ctx, bx, by, bw, bh, 24); ctx.clip(); ctx.drawImage(img, bx, by, bw, bh); ctx.restore(); }catch(e){} }
+      ctx.fillStyle = '#111827'; ctx.font = '700 56px system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillText('公益知识问答', bx, by + bh + 80);
+      ctx.fillStyle = '#3a8cdf'; ctx.font = '800 120px system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillText(document.getElementById('scoreText').textContent, bx, by + bh + 200);
+      ctx.fillStyle = '#374151'; ctx.font = '600 40px system-ui, -apple-system, Segoe UI, Roboto';
+      ctx.fillText(`正确 ${document.getElementById('statRight').textContent} · 错误 ${document.getElementById('statWrong').textContent} · 用时 ${document.getElementById('statTime').textContent}`, bx, by + bh + 270);
+      ctx.fillStyle = '#374151'; ctx.font = '700 44px system-ui, -apple-system, Segoe UI, Roboto';
+      const S = SLOGANS[sloganIdx] || 'Rambo 说：善意不设门槛';
+      ctx.fillText(S, bx, H - pad - 100);
+      ctx.fillStyle = '#6b7280'; ctx.font = '500 34px system-ui, -apple-system, Segoe UI, Roboto'; ctx.fillText('Rambo 公益互动站｜扫码参与', bx, H - pad - 40);
+    }
+
+    // 事件绑定
+    document.getElementById('btnStart').addEventListener('click', ()=>{ hide(els.screenStart); show(els.screenQuiz); render(); startTimer(); });
+    document.getElementById('btnShuffle').addEventListener('click', ()=>{ reset(true); hide(els.screenStart); show(els.screenQuiz); render(); startTimer(); });
+    document.getElementById('btnPrev').addEventListener('click', ()=>{ if(idx>0){ idx--; render(); } });
+    document.getElementById('btnNext').addEventListener('click', ()=>{ if(idx < QUESTIONS.length-1){ idx++; render(); } else { submit(); } });
+    document.getElementById('btnClear').addEventListener('click', ()=>{ picks[idx]=null; render(); });
+    document.getElementById('btnReview').addEventListener('click', ()=>{ document.getElementById('reviewBox').classList.toggle('hidden'); });
+    document.getElementById('btnAgain').addEventListener('click', ()=>{ reset(false); });
+    document.getElementById('btnResetTop').addEventListener('click', ()=>{ reset(false); });
+    const btnShare = document.getElementById('btnShare');
+    const shareWrap = document.getElementById('shareWrap');
+    const btnDownload = document.getElementById('btnDownload');
+    btnShare.addEventListener('click', ()=>{ drawShare(); shareWrap.classList.add('show'); const c = document.getElementById('shareCanvas'); if(c){ btnDownload.href = c.toDataURL('image/png'); } });
+    const btnNextSlogan = document.getElementById('btnNextSlogan');
+    btnNextSlogan.addEventListener('click', ()=>{ sloganIdx = (sloganIdx+1)%SLOGANS.length; els.sloganBox.textContent = SLOGANS[sloganIdx]; });
+
+    // 设置徽章按钮
+    const btnSetBadge = document.getElementById('btnSetBadge');
+    const badgeFile = document.getElementById('badgeFile');
+    btnSetBadge.addEventListener('click', ()=>{
+      const pick = window.prompt('输入徽章图片链接（或留空使用本地上传）：');
+      if(pick && pick.trim()){ setBadgeURL(pick.trim()); }
+      else { badgeFile.click(); }
+    });
+    badgeFile.addEventListener('change', (e)=>{ if(e.target.files && e.target.files[0]) pickLocalBadge(e.target.files[0]); });
+
+    // init
+    reset(false);
+    // 默认载入 assets/徽章.png
+    try{ setBadgeURL('./assets/徽章.png'); }catch(e){}
+  </script>
+</body>
+</html>
