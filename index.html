@@ -6,26 +6,13 @@
   <title>Rambo 公益互动站｜公益知识问答</title>
   <meta name="theme-color" content="#43A2FF" />
   <style>
-    :root{
-      --brand:#43A2FF;
-      --brand-dark:#357fd4;
-      --accent:#FFB84D;
-      --bg:#f7faff;
-      --text:#1f2a37;
-      --muted:#6b7280;
-      --card:#ffffff;
-      --radius:18px;
-      --shadow:0 10px 30px rgba(67,162,255,.15);
-    }
+    :root{ --brand:#43A2FF; --brand-dark:#357fd4; --accent:#FFB84D; --text:#1f2a37; --muted:#6b7280; --card:#ffffff; --radius:18px; --shadow:0 10px 30px rgba(67,162,255,.15); }
     *{box-sizing:border-box}
     html,body{height:100%}
+    html{scroll-behavior:smooth}
     body{
-      margin:0;
-      font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
-      color:var(--text);
-      background: radial-gradient(1200px 600px at 70% -10%, #e8f2ff 0%, transparent 60%),
-                  radial-gradient(900px 500px at -10% 20%, #fff1db 0%, transparent 60%),
-                  linear-gradient(180deg,#f5f9ff 0%,#ffffff 100%);
+      margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif; color:var(--text);
+      background: radial-gradient(1200px 600px at 70% -10%, #e8f2ff 0%, transparent 60%), radial-gradient(900px 500px at -10% 20%, #fff1db 0%, transparent 60%), linear-gradient(180deg,#f5f9ff 0%,#ffffff 100%);
     }
     .container{max-width:960px;margin:0 auto;padding:24px}
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
@@ -76,10 +63,7 @@
     canvas.share{width:100%;max-width:420px;border:1px solid #e5e7eb;border-radius:16px}
     .footer-mark{display:flex;align-items:center;gap:8px;justify-content:center;color:#94a3b8;font-size:12px;margin-top:20px}
     .footer-mark img{width:16px;height:16px;border-radius:4px}
-    @media (max-width:520px){
-      .btn{width:100%}
-      .footer{flex-direction:column;align-items:stretch}
-    }
+    @media (max-width:520px){ .btn{width:100%} .footer{flex-direction:column;align-items:stretch} }
   </style>
 </head>
 <body>
@@ -92,7 +76,6 @@
           <div class="muted" style="font-size:12px">Rambo 公益互动站</div>
         </div>
       </div>
-      <!-- 右上角按钮已移除：徽章、重做 -->
     </header>
 
     <!-- Start Screen -->
@@ -165,6 +148,12 @@
   </div>
 
   <script>
+    // 工具：强制把卡片顶到视口
+    function jumpTo(el){
+      try { el.scrollIntoView({behavior:'smooth', block:'start'}); }
+      catch(e){ try{ window.scrollTo(0,0); }catch(_){} }
+    }
+
     const SINGLE = [
       {type:'single',title:'“公益”的核心目标是？',options:['追求利润最大化','解决公共问题、增进社会福祉','扩大品牌曝光','获取税收减免'],answer:1,explain:'公益以社会价值为导向，强调公共利益。'},
       {type:'single',title:'发起校园募捐活动时最重要的第一步是？',options:['先做精美海报','明确受益对象与用途并公开说明','找名人站台','先定抽奖奖励'],answer:1,explain:'信息透明是信任基础。'},
@@ -214,22 +203,14 @@
       sloganBox: document.getElementById('sloganBox'),
     };
 
-    let idx = 0;
-    let picks = Array(QUESTIONS.length).fill(null);
-    let startAt = 0;
-    let timerId = null;
-    const SLOGANS = [
-      'Rambo 说：善意不设门槛',
-      '跟着 Rambo 去做对的事',
-      'Rambo 认证：公益小达人',
-      'Rambo 为你点亮小星星'
-    ];
+    let idx = 0, picks = Array(QUESTIONS.length).fill(null), startAt = 0, timerId = null;
+    const SLOGANS = ['Rambo 说：善意不设门槛','跟着 Rambo 去做对的事','Rambo 认证：公益小达人','Rambo 为你点亮小星星'];
     let sloganIdx = Math.floor(Math.random()*SLOGANS.length);
 
     function fmtTime(sec){ const m=String(Math.floor(sec/60)).padStart(2,'0'); const s=String(Math.floor(sec%60)).padStart(2,'0'); return `${m}:${s}`;}
     function startTimer(){ startAt=Date.now(); stopTimer(); timerId=setInterval(()=>{ const elapsed=Math.floor((Date.now()-startAt)/1000); els.timer.textContent=fmtTime(elapsed); },500); }
     function stopTimer(){ if(timerId){ clearInterval(timerId); timerId=null; } }
-    function show(el){ el.classList.remove('hidden'); try{ window.scrollTo({top:0, behavior:'instant'});}catch(_){} }
+    function show(el){ el.classList.remove('hidden'); }
     function hide(el){ el.classList.add('hidden'); }
     function shuffle(arr){ for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]];} return arr; }
 
@@ -241,6 +222,7 @@
       els.bar.style.width = '0%';
       els.timer.textContent = '00:00';
       hide(els.screenQuiz); hide(els.screenResult); show(els.screenStart);
+      jumpTo(document.body);
     }
 
     function render(){
@@ -260,6 +242,8 @@
       updateBar();
       els.btnPrev.disabled = idx===0;
       els.btnNext.textContent = idx===QUESTIONS.length-1 ? '提交' : '下一题';
+      // 强制把题卡顶到视口，避免“出现在最下面”
+      jumpTo(els.screenQuiz);
     }
 
     function updateBar(){ const answered=picks.filter(v=>v!==null).length; const pct=Math.round(answered/QUESTIONS.length*100); els.bar.style.width=pct+'%'; }
@@ -284,6 +268,7 @@
         els.reviewList.appendChild(div);
       });
       hide(els.screenQuiz); show(els.screenResult);
+      jumpTo(els.screenResult);
       stopTimer();
     }
 
@@ -298,7 +283,8 @@
       ctx.fillStyle='#111827'; ctx.font='700 56px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText('公益知识问答', bx, by + bh + 80);
       ctx.fillStyle='#3a8cdf'; ctx.font='800 120px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText(document.getElementById('scoreText').textContent, bx, by + bh + 190);
       ctx.fillStyle='#374151'; ctx.font='600 40px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText(`正确 ${document.getElementById('statRight').textContent} · 错误 ${document.getElementById('statWrong').textContent} · 用时 ${document.getElementById('statTime').textContent}`, bx, by + bh + 250);
-      ctx.fillStyle='#374151'; ctx.font='700 44px system-ui,-apple-system,Segoe UI,Roboto'; const slogans = ['Rambo 说：善意不设门槛','跟着 Rambo 去做对的事','Rambo 认证：公益小达人','Rambo 为你点亮小星星']; const slogan = slogans[sloganIdx] || slogans[0]; ctx.fillText(slogan, bx, H - pad - 100);
+      const slogans = ['Rambo 说：善意不设门槛','跟着 Rambo 去做对的事','Rambo 认证：公益小达人','Rambo 为你点亮小星星']; const slogan = slogans[sloganIdx] || slogans[0];
+      ctx.fillStyle='#374151'; ctx.font='700 44px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText(slogan, bx, H - pad - 100);
       ctx.fillStyle='#6b7280'; ctx.font='500 34px system-ui,-apple-system,Segoe UI,Roboto'; ctx.fillText('Rambo 公益互动站｜扫码参与', bx, H - pad - 40);
     }
 
@@ -309,7 +295,7 @@
     document.getElementById('btnNext').addEventListener('click', ()=>{ if(idx < QUESTIONS.length-1){ idx++; render(); } else { submit(); } });
     document.getElementById('btnClear').addEventListener('click', ()=>{ picks[idx]=null; render(); });
     document.getElementById('btnReview').addEventListener('click', ()=>{ document.getElementById('reviewBox').classList.toggle('hidden'); });
-    document.getElementById('btnAgain').addEventListener('click', ()=>{ reset(false); });
+    document.getElementById('btnAgain').addEventListener('click', ()=>{ reset(false); jumpTo(els.screenStart); });
     const btnShare=document.getElementById('btnShare'); const shareWrap=document.getElementById('shareWrap'); const btnDownload=document.getElementById('btnDownload');
     btnShare.addEventListener('click', ()=>{ drawShare(); shareWrap.classList.add('show'); const c=document.getElementById('shareCanvas'); if(c){ btnDownload.href=c.toDataURL('image/png'); } });
     const btnNextSlogan = document.getElementById('btnNextSlogan'); btnNextSlogan.addEventListener('click', ()=>{ const slogans = ['Rambo 说：善意不设门槛','跟着 Rambo 去做对的事','Rambo 认证：公益小达人','Rambo 为你点亮小星星']; sloganIdx=(sloganIdx+1)%slogans.length; els.sloganBox.textContent=slogans[sloganIdx]; });
